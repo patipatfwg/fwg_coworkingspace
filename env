@@ -1,5 +1,0 @@
-<?php
-   $servername = base64_decode("NTIuMTYzLjgyLjI0OToxMTc4");
-    $username = base64_decode("cHJvbXB0YWRt");
-    $password = base64_decode("Y2hlZSNNYWk1");
-    $dbname = base64_decode("aHJzZXJ2aWNlcw==");
