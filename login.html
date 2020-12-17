@@ -62,22 +62,31 @@
   <script src="js/jquery.cookie.js" type="text/javascript"></script>
   <script language="javascript">
   $(document).ready(function(){
-
+    $(this).keypress(function (ev) {
+      var keycode = (ev.keyCode ? ev.keyCode : ev.which);
+      if (keycode == '13') {
+        start();
+      }
+    })
     $("#onClickSignin").click(function(){
-      var username = $("#InputUsername").val();
-      var password = $("#InputPassword").val();
-      if( username!="" && password!="" )
-      {
-        checkLogin(username,password);
-      }
-      else if( username=="" || password=="" )
-      {
-        var msg = "Please Sign In Again";
-        $("#msgbox").html(msg);
-      }
+      start();
     });
-
   });
+
+  function start()
+  {
+    var username = $("#InputUsername").val();
+    var password = $("#InputPassword").val();
+    if( username!="" && password!="" )
+    {
+      checkLogin(username,password);
+    }
+    else if( username=="" || password=="" )
+    {
+      var msg = "Please Sign In Again";
+      $("#msgbox").html(msg);
+    }  
+  }
 
   function checkLogin(username,password)
   {
