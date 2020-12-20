@@ -1,6 +1,7 @@
 <?php
 
 date_default_timezone_set("Asia/Bangkok");
+header('Content-Type: application/json');
 
 // Login 
 // Dashboard
@@ -11,24 +12,57 @@ if($_SERVER['REQUEST_METHOD'] === 'POST')
     $action = $_REQUEST["action"];
     if($action=='login')
     {
-        include("config.php");
         $username = $_REQUEST["username"];
         $password = $_REQUEST["password"];
-        $sql = "SELECT first_name_en,last_name_en,user_id FROM user LEFT JOIN employee ON user.id = employee.user_id WHERE user.activate = 1 AND user.id = '$username' AND user.password = '$password'";
+
+        include("config.php");
+        $sqlWHERE = " WHERE user.activate = 1 AND user.id = '$username' AND user.password = '$password'";
+        $sql = "SELECT employee.id,user_id,first_name_en,last_name_en FROM user LEFT JOIN employee ON user.id = employee.user_id".$sqlWHERE;
         $result = $mysqli->query($sql);
         $count = mysqli_num_rows($result);
         if($count>0)
         {
             $row = $result->fetch_array();
+            $msg = "OK";
             $code = 200;
+            $employee_id = $row["id"];
+            $user_id = $row["user_id"];
             $first_name_en = $row["first_name_en"];
             $last_name_en = $row["last_name_en"];
-            $user_id = $row["user_id"];
+
+            $FLAG_CLONE = 1;
+            if($FLAG_CLONE==1)
+            {
+                include("configmdc.php");
+                $sql = "SELECT * FROM employee WHERE employee_id='$employee_id'";
+                $result = $mysqli->query($sql);
+                $count = mysqli_num_rows($result);
+                if($count>0)
+                {
+                    $row = $result->fetch_array();
+                    $user_id_mdc = $row["user_id"];
+                    if($user_id_mdc=="")
+                    {
+                        $sqlB = "UPDATE employee SET user_id='$user_id'  WHERE employee_id='$employee_id'";
+                        $resultB = $mysqli->query($sqlB);
+                        $msg = $sqlB;
+                    }
+                }
+                else if($count==0)
+                {
+                    $sqlB = "INSERT INTO employee (employee_id,user_id,first_name_en,last_name_en) VALUES ('$employee_id','$user_id','$first_name_en','$last_name_en')";
+                    $resultB = $mysqli->query($sqlB);
+                    $msg = $sqlB;
+                }
+            }
+
             $myArray = array(
                 "code"=>$code,
+                "message"=>$msg,
                 "firstname"=>$first_name_en,
                 "lastname"=>$last_name_en,
-                "user_id"=>$user_id
+                "user_id"=>$user_id,
+                "employee_id"=>$employee_id
             );
             $mysqli->close();
         }
@@ -38,23 +72,18 @@ if($_SERVER['REQUEST_METHOD'] === 'POST')
             $msg = "User or Password is incorrect";
             $myArray = array(
                 "code"=>$code,
-                "Message"=>$msg
+                "message"=>$msg
             );
-        }
-        echo json_encode($myArray);       
+        }     
     }
     else if($action=='dashboard')
     {
         $code = 200;
-        
-
-
         $msg = "Hi";
         $myArray = array(
             "code"=>$code,
             "Message"=>$msg
         );
-        echo json_encode($myArray);
     }
     else if($action=='booking')
     {
@@ -68,8 +97,30 @@ if($_SERVER['REQUEST_METHOD'] === 'POST')
             "zone"=>$zoneList,
             "dashboard"=>$dashboard
         );
-        echo json_encode($myArray);
     }
+    else if($action=='showseat')
+    {
+        include("configmdc.php");
+        $sql = "SELECT * FROM booking_employee LEFT JOIN employee ON booking_employee.user_id = employee.user_id WHERE DATE(booking_employee.booking_employee_end) = CURDATE()";
+        $result = $mysqli->query($sql);
+        $count = mysqli_num_rows($result);
+        if($count>0)
+        {
+            $row = $result->fetch_array();
+            $first_name_en = $row["first_name_en"];
+            $last_name_en = $row["last_name_en"];
+
+            $code = 200;
+            $myArray = array(
+                "code"=>$code,
+                "message"=>"OK",
+                "first_name_en"=>$first_name_en,
+                "last_name_en"=>$last_name_en
+            );
+        }
+    }
+
+    echo json_encode($myArray); 
 }
 
 function getZone()
