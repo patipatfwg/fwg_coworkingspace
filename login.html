@@ -102,6 +102,9 @@
       var code = msg['code'];
       if(code==200)
       {
+        var dt = new Date();
+        var datedate = dt.getFullYear() + dt.getMonth() + dt.getDay();
+
         var firstname = msg['firstname'];
         var lastname = msg['lastname'];
         var user_id = msg['user_id'];
@@ -109,6 +112,7 @@
         localStorage.setItem("lastname", lastname);
         localStorage.setItem("user_id", user_id);
         localStorage.setItem("login_isActive", 1);
+        localStorage.setItem("login_at", datedate);
         localStorage.setItem("route", "dashboard");
         window.location.assign("index.html")
       }
