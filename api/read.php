@@ -6,6 +6,7 @@ header('Content-Type: application/json');
 // Login 
 // Dashboard
 // Booking
+// ShowSeat
 
 if($_SERVER['REQUEST_METHOD'] === 'POST')
 {
@@ -100,8 +101,13 @@ if($_SERVER['REQUEST_METHOD'] === 'POST')
     }
     else if($action=='showseat')
     {
+        $seat = $_REQUEST["booking_seat_id"];
+
         include("configmdc.php");
-        $sql = "SELECT * FROM booking_employee LEFT JOIN employee ON booking_employee.user_id = employee.user_id WHERE DATE(booking_employee.booking_employee_end) = CURDATE()";
+        // $sql = "SELECT * FROM booking_employee LEFT JOIN employee ON booking_employee.user_id = employee.user_id WHERE DATE(booking_employee.booking_employee_end) = CURDATE()";
+        $sqlDATE = " AND DATE(booking_employee.booking_employee_end) = CURDATE()";
+        $sqlSeat = " booking_employee.booking_seat_id = '$seat'";
+        $sql = "SELECT first_name_en,last_name_en,TIME_FORMAT(TIME(booking_employee_start),'%H:%i') as timestart, TIME_FORMAT(TIME(booking_employee_end),'%H:%i') as timeend FROM booking_employee LEFT JOIN employee ON booking_employee.user_id = employee.user_id WHERE ".$sqlSeat.$sqlDATE;
         $result = $mysqli->query($sql);
         $count = mysqli_num_rows($result);
         if($count>0)
@@ -109,15 +115,29 @@ if($_SERVER['REQUEST_METHOD'] === 'POST')
             $row = $result->fetch_array();
             $first_name_en = $row["first_name_en"];
             $last_name_en = $row["last_name_en"];
+            $booking_employee_start = $row["timestart"];
+            $booking_employee_end = $row["timeend"];
 
             $code = 200;
             $myArray = array(
                 "code"=>$code,
                 "message"=>"OK",
                 "first_name_en"=>$first_name_en,
-                "last_name_en"=>$last_name_en
+                "last_name_en"=>$last_name_en,
+                "booking_employee_start"=>$booking_employee_start,
+                "booking_employee_end"=>$booking_employee_end,
+
             );
         }
+        else
+        {
+            $code = 404;
+            $myArray = array(
+                "code"=>$code,
+                "message"=>"Not Found"
+            ); 
+        }
+
     }
 
     echo json_encode($myArray); 

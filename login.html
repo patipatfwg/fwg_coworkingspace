@@ -71,6 +71,12 @@
     $("#onClickSignin").click(function(){
       start();
     });
+
+    //
+    var dt = new Date();
+        var time = dt.getHours();
+        console.log("time: "+time);
+    //
   });
 
   function start()
@@ -103,7 +109,7 @@
       if(code==200)
       {
         var dt = new Date();
-        var datedate = dt.getFullYear() + dt.getMonth() + dt.getDay();
+        var time = dt.getHours();
 
         var firstname = msg['firstname'];
         var lastname = msg['lastname'];
@@ -112,7 +118,7 @@
         localStorage.setItem("lastname", lastname);
         localStorage.setItem("user_id", user_id);
         localStorage.setItem("login_isActive", 1);
-        localStorage.setItem("login_at", datedate);
+        localStorage.setItem("login_at", time);
         localStorage.setItem("route", "dashboard");
         window.location.assign("index.html")
       }
