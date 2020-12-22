@@ -140,7 +140,11 @@ function checkBooking(seat)
       {
         console.log(code);
         title ="Seat: "+seat;
-        description += BookingForm();
+        description +="<input type='text' class='form-control form-control-md' placeholder='' id='InputDatetimeStart'>";
+        description +="<input type='text' class='form-control form-control-md mt-1' placeholder='' id='InputDatetimeEnd'>";
+        description +="<button type='button' class='form-control form-control-md btn btn-primary mt-1' id='Booking'>Booking</button>";
+        $("#InputDatetimeStart").val(FWGDate(2));
+        $("#InputDatetimeEnd").val(FWGDate(3));
       }
 
       driver.highlight({
@@ -157,56 +161,6 @@ function checkBooking(seat)
   });
 }
 
-function BookingForm()
-{
-  var r="";
-  r +="<div class='row'>";
-  r +=" Start : ";
-  r +="<select class='form-select form-control-sm' id='InputHourStart' required=''>";
-  var i=7;
-  while(i<=22)
-  {
-    r +="<option value='"+i+"'>"+i+"</option>";
-    i++; 
-  }
-  r +="</select>";
-  r +="<select class='form-select form-control-sm' id='InputMinStart' required=''>";
-  r +="<option value='0'>00</option>";
-  r +="<option value='30'>30</option>";
-  r +="</select>";
-  r +="</div>";
-  r +="<div class='row'>";
-  r +=" End   : ";
-  r +="<select class='form-select form-control-sm' id='InputHourEnd' required=''>";
-  var i=7;
-  while(i<=22)
-  {
-    r +="<option value='"+i+"'>"+i+"</option>";
-    i++; 
-  }
-  r +="</select>";
-  r +="<select class='form-select form-control-sm' id='InputMinEnd' required=''>";
-  r +="<option value='0'>00</option>";
-  r +="<option value='30'>30</option>";
-  r +="</select>";
-  r +="</div>";
-  r +="<button type='button' class='form-control form-control-md btn btn-primary mt-1' id='Booking' onclick='addBooking();'>Booking</button>";
-  
-
-  return r; 
-}
-
-function addBooking()
-{
-  var hourstart = $("#InputHourStart").val();
-  var minstart = $("#InputMinStart").val();
-  var hourend = $("#InputHourEnd").val();
-  var minend = $("#InputMinEnd").val();
-
-
-
-  callCreate(booking_employee_start,booking_employee_end);
-}
 
 function callCreate(booking_employee_start,booking_employee_end)
 {
@@ -301,6 +255,11 @@ function checkLogout()
   {
     return true;
   }
+}
+
+function addBooking()
+{
+
 }
 
 function cancelBooking(seat_id)
