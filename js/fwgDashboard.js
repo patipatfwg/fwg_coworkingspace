@@ -3,9 +3,9 @@ function KickStartDashboard()
   $checkLogout = checkLogout();
   if($checkLogout==true)
   {
-    $("#titleDatetime").val( FWGDate(1) );
-    $("#InputDatetimeStart").val(FWGDate(2));
-    $("#InputDatetimeEnd").val(FWGDate(3)); 
+    $("#titleDatetime").val( FWGDate('today','string') );
+    $("#InputDatetimeStart").val(FWGDate(2,0));
+    $("#InputDatetimeEnd").val(FWGDate(3,0)); 
     displayDashboard();    
   }  
 }
@@ -24,37 +24,50 @@ function displayDashboard()
     var code = msg.code;
     if(code==200)
     {
-      showSeat('AA','A',1,8,4);
-      showSeat('AB','A',9,14,11);
-      showSeat('AC','A',15,20,0);
+      showSeatAA('AA','A',1,8,4);
+      showSeatAB('AB','A',9,14,11);
+      showSeatAC('AC','A',15,20,0);
 
-      showSeat('BA','B',1,20,5);
+      showSeatB('BA','B',1,20,5);
 
-      showSeat('DA','D',1,10,5);
-      showSeat('DB','D',11,20,15);
-      showSeat('DC','D',24,28,4);
-      showSeat('DD','D',29,36,4);
+      showSeatC('CA','C',1,8,4);
+      showSeatC('CB','C',9,22,15);
+      showSeatC('CC','C',23,26,24);
 
-      showSeat('EA','E',1,24,5);
-      showSeat('EB','E',25,27,0);
+      showSeatD('DA','D',1,20,5);
+      showSeatD('DB','D',21,28,24);
+      showSeatD('DC','D',29,36,32);
+
+      showSeatC('EA','E',1,24,5);
+      showSeatC('EB','E',25,27,0);
 
       // $("#msgbox").html(msg);
     }
   }); 
 }
 
-function FWGDate(sw)
+function FWGDate(sw,subsw)
 {
   // var d = new Date().toLocaleDateString();
   var dt = new Date();
   var time = dt.getHours() + ":" + dt.getMinutes();
 
-  if(sw==1)
+  if(sw=='today')
   {
-    var dayArr= ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
-    dt.setDate(dt.getDate());
-    var monthArr = ["January", "February","March", "April", "May", "June", "July", "August", "September", "October", "November","December"];
-    var date = dayArr[dt.getDay()].toUpperCase() +", "+ dt.getDate() +" "+ monthArr[dt.getMonth()].toUpperCase() +" "+ dt.getFullYear();      
+    if(subsw=='string')
+    {
+      var dayArr= ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+      dt.setDate(dt.getDate());
+      var monthArr = ["January", "February","March", "April", "May", "June", "July", "August", "September", "October", "November","December"];
+      var date = dayArr[dt.getDay()].toUpperCase() +", "+ dt.getDate() +" "+ monthArr[dt.getMonth()].toUpperCase() +" "+ dt.getFullYear();  
+    }
+    else if(subsw=='int')
+    {
+      var month = (dt.getMonth()+1);
+      var date = dt.getFullYear() + "-" +month+ "-" + dt.getDate();
+      // console.log(date);
+    }
+    
   }
   else if(sw==2)
   {
@@ -74,18 +87,18 @@ function FWGDate(sw)
 
 function showSeat(group,name,start,end,sub)
 {
-  var text = "";
+  var text = "<div class='row'>";
   var i = start;
   var cut = sub;
   while (i <= end) {
     textname = name+i;
-    text += "<div id='"+textname+"' class='SeatAvailable' onclick='checkBooking(#"+textname+")'>"+
+    text += "<div id='"+textname+"' class='SeatAvailable' >"+
               textname+
             "</div>";
 
     if(i==cut && sub!=0)
     {
-      text+="||";
+      text+="</div><div class='row'>";
       cut=cut+sub;
     }
     i++;
@@ -96,13 +109,193 @@ function showSeat(group,name,start,end,sub)
   var j = start;
   while (j <= end) {
     var textname = name+j;
-    checkBooking(textname);
+    showBooking(textname);
     j++;
   }
 
 }
 
-function checkBooking(seat)
+function showSeatAA(group,name,start,end,sub)
+{
+  var marginleft = "style='margin-top:1px; margin-left: 18px;'";
+  var text = "<div class='row' "+marginleft+">";
+  var i = start;
+  var cut = sub;
+  while (i <= end) {
+    textname = name+i;
+    text += "<div id='"+textname+"' class='SeatAvailableB' >"+
+              textname+
+            "</div>";
+
+    if(i==cut && sub!=0)
+    {
+      text+="</div><div class='row' "+marginleft+">";
+      cut=cut+sub;
+    }
+    i++;
+  }
+  idname = "#"+group;
+  $(idname).html(text);
+
+  var j = start;
+  while (j <= end) {
+    var textname = name+j;
+    showBooking(textname);
+    j++;
+  }
+
+}
+
+function showSeatAB(group,name,start,end,sub)
+{
+  var marginleft = "style='margin-top:10px; margin-left: 40px;'";
+  var text = "<div class='row' "+marginleft+">";
+  var i = start;
+  var cut = sub;
+  while (i <= end) {
+    textname = name+i;
+    text += "<div id='"+textname+"' class='SeatAvailableB' >"+
+              textname+
+            "</div>";
+
+    if(i==cut && sub!=0)
+    {
+      text+="</div><div class='row' style='margin-top:1px; margin-left: 40px;' >";
+      cut=cut+sub;
+    }
+    i++;
+  }
+  idname = "#"+group;
+  $(idname).html(text);
+
+  var j = start;
+  while (j <= end) {
+    var textname = name+j;
+    showBooking(textname);
+    j++;
+  }
+
+}
+
+function showSeatAC(group,name,start,end,sub)
+{
+  var marginleft = "style='margin-top: 2px; margin-left: -20px;'";
+  var text = "<div class='row' "+marginleft+">";
+  var i = start;
+  var cut = sub;
+  while (i <= end) {
+    textname = name+i;
+    text += "<div id='"+textname+"' class='SeatAvailable' >"+
+              textname+
+            "</div>";
+    i++;
+  }
+  idname = "#"+group;
+  $(idname).html(text);
+
+  var j = start;
+  while (j <= end) {
+    var textname = name+j;
+    showBooking(textname);
+    j++;
+  }
+
+}
+
+function showSeatB(group,name,start,end,sub)
+{
+  var marginleft = "style='margin-top 1px; margin-left: 25px;'";
+  var text = "<div class='row' "+marginleft+">";
+  var i = start;
+  var cut = sub;
+  while (i <= end) {
+    textname = name+i;
+    text += "<div id='"+textname+"' class='SeatAvailableB' >"+
+              textname+
+            "</div>";
+
+    if(i==cut && sub!=0)
+    {
+      text+="</div><div class='row' "+marginleft+">";
+      cut=cut+sub;
+    }
+    i++;
+  }
+  idname = "#"+group;
+  $(idname).html(text);
+
+  var j = start;
+  while (j <= end) {
+    var textname = name+j;
+    showBooking(textname);
+    j++;
+  }
+
+}
+
+function showSeatC(group,name,start,end,sub)
+{
+  var marginleft = "style='margin-top 1px; margin-left: 25px;'";
+  var text = "<div class='row' "+marginleft+">";
+  var i = start;
+  var cut = sub;
+  while (i <= end) {
+    textname = name+i;
+    text += "<div id='"+textname+"' class='SeatAvailableB' >"+
+              textname+
+            "</div>";
+
+    if(i==cut && sub!=0)
+    {
+      text+="</div><div class='row' "+marginleft+">";
+      cut=cut+sub;
+    }
+    i++;
+  }
+  idname = "#"+group;
+  $(idname).html(text);
+
+  var j = start;
+  while (j <= end) {
+    var textname = name+j;
+    showBooking(textname);
+    j++;
+  }
+
+}
+
+function showSeatD(group,name,start,end,sub)
+{
+  var marginleft = "style='margin-top 1px; margin-left: 12px;'";
+  var text = "<div class='row' "+marginleft+">";
+  var i = start;
+  var cut = sub;
+  while (i <= end) {
+    textname = name+i;
+    text += "<div id='"+textname+"' class='SeatAvailableB' >"+
+              textname+
+            "</div>";
+
+    if(i==cut && sub!=0)
+    {
+      text+="</div><div class='row' "+marginleft+">";
+      cut=cut+sub;
+    }
+    i++;
+  }
+  idname = "#"+group;
+  $(idname).html(text);
+
+  var j = start;
+  while (j <= end) {
+    var textname = name+j;
+    showBooking(textname);
+    j++;
+  }
+
+}
+
+function showBooking(seat)
 {
   const driver = new Driver({ opacity: 0.4, showButtons: false, stageBackground: '#ffffff', allowClose: true });
   var seat_id = "#"+seat;
@@ -123,24 +316,27 @@ function checkBooking(seat)
       var code = msg.code;
       if(code==200)
       {
-        console.log(code);
+        // console.log(code);
+        var booking_employee_id = msg.booking_employee_id;
         description +=msg.first_name_en+" "+msg.last_name_en;
-        description +="<br>"+msg.booking_employee_start+" - "+msg.booking_employee_end+cancel_btn;
         if(msg.first_name_en==localStorage.getItem("firstname") && msg.last_name_en==localStorage.getItem("lastname"))
         {
-          console.log(seat_id);
-          cancel_btn +="  <button id='cancleBooking' onclick='cancelBooking("+seat_id+")'>ยกเลิกการจอง</button>";
+          cancel_btn +="  <i id='cancleBooking' class='mdi mdi-close-box-outline text-danger mx-0'  onclick='cancelBooking()'>Cancel Booking</i>";
+          cancel_btn +="<input type='hidden' id='booking_employee_id' value='"+booking_employee_id+"'>"
+
         }
         else
         {
           cancel_btn +="";
         }
+        description +="<br><b>At:</b> ";
+        description +=msg.booking_employee_time_start+" - "+msg.booking_employee_time_end+cancel_btn;
       }
       else if(code==404)
       {
-        console.log(code);
-        title ="Seat: "+seat;
-        description += BookingForm();
+        console.log("showSeat "+code);
+        title ="Seat: "+seat+"";
+        description += BookingForm(seat);
       }
 
       driver.highlight({
@@ -157,70 +353,105 @@ function checkBooking(seat)
   });
 }
 
-function BookingForm()
+function BookingForm(tmp_seat)
 {
-  var r="";
-  r +="<div class='row'>";
-  r +=" Start : ";
-  r +="<select class='form-select form-control-sm' id='InputHourStart' required=''>";
-  var i=7;
-  while(i<=22)
-  {
-    r +="<option value='"+i+"'>"+i+"</option>";
-    i++; 
-  }
-  r +="</select>";
-  r +="<select class='form-select form-control-sm' id='InputMinStart' required=''>";
-  r +="<option value='0'>00</option>";
-  r +="<option value='30'>30</option>";
-  r +="</select>";
-  r +="</div>";
-  r +="<div class='row'>";
-  r +=" End   : ";
-  r +="<select class='form-select form-control-sm' id='InputHourEnd' required=''>";
-  var i=7;
-  while(i<=22)
-  {
-    r +="<option value='"+i+"'>"+i+"</option>";
-    i++; 
-  }
-  r +="</select>";
-  r +="<select class='form-select form-control-sm' id='InputMinEnd' required=''>";
-  r +="<option value='0'>00</option>";
-  r +="<option value='30'>30</option>";
-  r +="</select>";
-  r +="</div>";
-  r +="<button type='button' class='form-control form-control-md btn btn-primary mt-1' id='Booking' onclick='addBooking();'>Booking</button>";
-  
+  var d = new Date();
+  var Hour = d.getHours();
+  var Hours = Hour + 1;
 
-  return r; 
+  var r="";
+  r +="<div id='booking-form' class='col' >";
+  r +="<div id='booking-form1' class='row' >";
+  r +="<div class='col-4'>";
+  r +="<label>Start :</label>";
+  r +="</div>";
+  r +="<div class='col-4'>";
+  r +="<select class='form-select form-control-sm' id='InputHourStart' required=''>";
+  var i=6;
+  while(i<=23)
+  {
+    var ss = "";
+    if(Hour==i)
+    {
+      var ss = "selected='selected'";
+    }
+    r +="<option "+ss+" value='"+i+"'>"+i+"</option>";
+    i++; 
+  }
+  r +="</select>";
+  r +="</div>";
+  r +="<div class='col-4'>";
+  r +="<select class='form-select form-control-sm' id='InputMinStart' required=''>";
+  r +="<option value='0' selected='selected'>00</option>";
+  r +="<option value='30'>30</option>";
+  r +="</select>";
+  r +="</div>";
+  r +="</div>";
+  r +="<div id='booking-form2' class='row mt-1 mb-1'>";
+  r +="<div class='col-4'>";
+  r +="<label>End :</label>";
+  r +="</div>";
+  r +="<div class='col-4'>";
+  r +="<select class='form-select form-control-sm' id='InputHourEnd'>";
+  var i=6;
+  while(i<=23)
+  {
+    var ss = "";
+    if(Hour==i)
+    {
+      var ss = "selected='selected'";
+    }
+    r +="<option "+ss+" value='"+i+"'>"+i+"</option>";
+    i++;  
+  }
+  r +="</select>";
+  r +="</div>";
+  r +="<div class='col-4'>";
+  r +="<select class='form-select form-control-sm' id='InputMinEnd'>";
+  r +="<option value='0'>00</option>";
+  r +="<option value='30' selected='selected'>30</option>";
+  r +="</select>";
+  r +="</div>";
+  r +="</div>";
+  r +="<div id='booking-form3' class='row'>";
+  r +="<span id='btn-add-booking' class='form-control btn btn-warning' onclick='addBooking()'>Booking</span>";
+  r +="<input type='hidden' id='seat_number' value='"+tmp_seat+"'>"
+  r +="</div>";
+  r +="<div id='booking-form4' class='row'>";
+  r +="</div>";
+  r +="</div>";
+  r +="</div>";
+
+  return r;
 }
 
 function addBooking()
 {
+  // document.getElementById("btn-add-booking").style.display = "none";
+
+  var tmp_seat = $('#seat_number').val();
+  var booking_zone_id = tmp_seat.substring(0, 1);
+
+  var datestart = FWGDate('today','int');
   var hourstart = $("#InputHourStart").val();
   var minstart = $("#InputMinStart").val();
   var hourend = $("#InputHourEnd").val();
   var minend = $("#InputMinEnd").val();
+  var timestart = hourstart+":"+minstart;
+  var timeend = hourend+":"+minend;  
 
-
-
-  callCreate(booking_employee_start,booking_employee_end);
-}
-
-function callCreate(booking_employee_start,booking_employee_end)
-{
   var request = $.ajax({
     method: "POST",url: "api/create.php",
     data: { 
       action : "add",
       user_id : localStorage.getItem("user_id"),
-      booking_employee_start : $("#InputDatetimeStart").val(),
-      booking_employee_end : $("#InputDatetimeEnd").val(),
+      booking_employee_date : datestart,
+      booking_employee_time_start : timestart,
+      booking_employee_time_end : timeend,
       booking_type_id : 1,
       booking_room_id : 0,
-      booking_zone_id : $("#InputZone").val(),
-      booking_seat_id : $("#InputSeat").val()
+      booking_zone_id : booking_zone_id,
+      booking_seat_id : tmp_seat
     }
   });
   request.fail(function (jqXHR, textStatus) {
@@ -231,57 +462,50 @@ function callCreate(booking_employee_start,booking_employee_end)
     var code = msg.code;
     if(code==200)
     {
-      // $("#msgbox").html(msg);
-      alert(msg);
-    }
-    else
-    {
-      // $("#msgbox").html(msg);
-      alert(msg);
-    }
-  });      
-}
+      console.log("Success: "+code);
+      document.getElementById("booking-form1").innerHTML = "<b class='text-center'>Booking Success</b>";
+      document.getElementById("booking-form2").innerHTML = "";
+      document.getElementById("btn-add-booking").style.display = "none";
 
-function getSeatDescription(seat)
-{
-  var request = $.ajax({
-    method: "POST",url: "api/read.php",
-    data: { action:"showseat", booking_seat_id:seat }
-  });
-  request.fail(function (jqXHR, textStatus) {
-    //504
-    $("#msgbox").html("Please Check Internet");
-  });
-  request.done(function(msg) {
-    // const driver = new Driver({ opacity: 0.4, showButtons: false, stageBackground: '#ffffff', allowClose: true });
-    // var textseat = "#"+seat;
-    // console.log(textseat);
-
-    var code = msg.code;
-    if(code==200)
-    {
-      // $("#msgbox").html(msg.first_name_en);
-      alert("y");
-
-          // driver.highlight({
-          //   element: textseat,
-          //     popover: {
-          //       title: 'y',
-          //       description: 'Booking: 19:30 - 20:00',
-          //       position: 'top',
-          //     }
-          // });
+  
+      // setTimeout(() => {
+        // var proceed = confirm("Are you sure you want to proceed?");
+        // if (proceed) {
+        //   //proceed
+        // } else {
+        //   //don't proceed
+        // }
+      // }, 2000);
+      
     }
     else if(code==404)
     {
-      // driver.highlight({
-      //   element: textseat,
-      //     popover: {
-      //       title: 'n',
-      //       description: 'Booking: 19:30 - 20:00',
-      //       position: 'top',
-      //     }
-      // });
+      alert(msg);
+    }
+  });
+
+}
+
+function cancelBooking(seat)
+{
+  var booking_employee_id = $('#booking_employee_id').val();
+  var request = $.ajax({
+    method: "POST",url: "api/delete.php",
+    data: { action:"cancel" , booking_employee_id:booking_employee_id }
+  });
+  request.fail(function (jqXHR, textStatus) {
+    //504
+    $("#msgbox").html("Please Check Internet");
+  });
+  request.done(function(msg) {
+    var code = msg.code;
+    if(code==200)
+    {
+      alert(msg);
+    }
+    else if(code==404)
+    {
+
     }
   });
 }
@@ -303,28 +527,50 @@ function checkLogout()
   }
 }
 
-function cancelBooking(seat_id)
-{
-  var request = $.ajax({
-    method: "POST",url: "api/update.php",
-    data: { action:"cancel" , seat_id:seat_id }
-  });
-  request.fail(function (jqXHR, textStatus) {
-    //504
-    $("#msgbox").html("Please Check Internet");
-  });
-  request.done(function(msg) {
-    var code = msg.code;
-    if(code==200)
-    {
 
-    }
-    else if(code==404)
-    {
+// function getSeatDescription(seat)
+// {
+//   var request = $.ajax({
+//     method: "POST",url: "api/read.php",
+//     data: { action:"showseat", booking_seat_id:seat }
+//   });
+//   request.fail(function (jqXHR, textStatus) {
+//     //504
+//     $("#msgbox").html("Please Check Internet");
+//   });
+//   request.done(function(msg) {
+//     // const driver = new Driver({ opacity: 0.4, showButtons: false, stageBackground: '#ffffff', allowClose: true });
+//     // var textseat = "#"+seat;
+//     // console.log(textseat);
 
-    }
-  });
-}
+//     var code = msg.code;
+//     if(code==200)
+//     {
+//       // $("#msgbox").html(msg.first_name_en);
+//       alert("y");
+
+//           // driver.highlight({
+//           //   element: textseat,
+//           //     popover: {
+//           //       title: 'y',
+//           //       description: 'Booking: 19:30 - 20:00',
+//           //       position: 'top',
+//           //     }
+//           // });
+//     }
+//     else if(code==404)
+//     {
+//       // driver.highlight({
+//       //   element: textseat,
+//       //     popover: {
+//       //       title: 'n',
+//       //       description: 'Booking: 19:30 - 20:00',
+//       //       position: 'top',
+//       //     }
+//       // });
+//     }
+//   });
+// }
 
 // function Popover(seat)
 // {
@@ -364,4 +610,38 @@ function cancelBooking(seat_id)
 //     group.linewidth = 7;
 
 //     two.update();
+// }
+
+// function callCreate()
+// {
+//   var request = $.ajax({
+//     method: "POST",url: "api/create.php",
+//     data: { 
+//       action : "add",
+//       user_id : localStorage.getItem("user_id"),
+//       booking_employee_start : $("#InputDatetimeStart").val(),
+//       booking_employee_end : $("#InputDatetimeEnd").val(),
+//       booking_type_id : 1,
+//       booking_room_id : 0,
+//       booking_zone_id : $("#InputZone").val(),
+//       booking_seat_id : $("#InputSeat").val()
+//     }
+//   });
+//   request.fail(function (jqXHR, textStatus) {
+//     //504
+//     $("#msgbox").html("Please Check Internet");
+//   });
+//   request.done(function(msg) {
+//     var code = msg.code;
+//     if(code==200)
+//     {
+//       // $("#msgbox").html(msg);
+//       alert(msg);
+//     }
+//     else
+//     {
+//       // $("#msgbox").html(msg);
+//       alert(msg);
+//     }
+//   });      
 // }

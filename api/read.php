@@ -105,19 +105,23 @@ if($_SERVER['REQUEST_METHOD'] === 'POST')
 
         include("configmdc.php");
         // $sql = "SELECT * FROM booking_employee LEFT JOIN employee ON booking_employee.user_id = employee.user_id WHERE DATE(booking_employee.booking_employee_end) = CURDATE()";
-        $sqlDATE = " AND DATE(booking_employee.booking_employee_end) = CURDATE()";
+        date_default_timezone_set("Asia/Bangkok");
+        $getdate = date("Y-m-d");
+        $sqlDATE = " AND booking_employee.booking_employee_date = '$getdate'";
         $sqlSeat = " booking_employee.booking_seat_id = '$seat'";
-        $sql = "SELECT booking_employee_id,first_name_en,last_name_en,TIME_FORMAT(TIME(booking_employee_start),'%H:%i') as timestart, TIME_FORMAT(TIME(booking_employee_end),'%H:%i') as timeend FROM booking_employee LEFT JOIN employee ON booking_employee.user_id = employee.user_id WHERE ".$sqlSeat.$sqlDATE;
+        $sql = "SELECT booking_employee_id,first_name_en,last_name_en,TIME_FORMAT(booking_employee_time_start,'%H:%i') as timestart, TIME_FORMAT(booking_employee_time_end,'%H:%i') as timeend FROM booking_employee LEFT JOIN employee ON booking_employee.user_id = employee.user_id WHERE ".$sqlSeat.$sqlDATE;
+
         $result = $mysqli->query($sql);
         $count = mysqli_num_rows($result);
         if($count>0)
         {
+
             $row = $result->fetch_array();
             $booking_employee_id = $row["booking_employee_id"];
             $first_name_en = $row["first_name_en"];
             $last_name_en = $row["last_name_en"];
-            $booking_employee_start = $row["timestart"];
-            $booking_employee_end = $row["timeend"];
+            $booking_employee_time_start = $row["timestart"];
+            $booking_employee_time_end = $row["timeend"];
 
             $code = 200;
             $myArray = array(
@@ -125,9 +129,9 @@ if($_SERVER['REQUEST_METHOD'] === 'POST')
                 "message"=>"OK",
                 "first_name_en"=>$first_name_en,
                 "last_name_en"=>$last_name_en,
-                "booking_employee_start"=>$booking_employee_start,
-                "booking_employee_end"=>$booking_employee_end,
-
+                "booking_employee_time_start"=>$booking_employee_time_start,
+                "booking_employee_time_end"=>$booking_employee_time_end,
+                "booking_employee_id"=>$booking_employee_id
             );
         }
         else
