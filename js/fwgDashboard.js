@@ -82,35 +82,35 @@ function FWGDate(sw,subsw)
   return date;
 }
 
-function showSeat(group,name,start,end,sub)
-{
-  var text = "<div class='row'>";
-  var i = start;
-  var cut = sub;
-  while (i <= end) {
-    textname = name+i;
-    text += "<div id='"+textname+"' class='SeatAvailable' >"+
-              textname+
-            "</div>";
+// function showSeat(group,name,start,end,sub)
+// {
+//   var text = "<div class='row'>";
+//   var i = start;
+//   var cut = sub;
+//   while (i <= end) {
+//     textname = name+i;
+//     text += "<div id='"+textname+"' class='SeatAvailable' >"+
+//               textname+
+//             "</div>";
 
-    if(i==cut && sub!=0)
-    {
-      text+="</div><div class='row'>";
-      cut=cut+sub;
-    }
-    i++;
-  }
-  idname = "#"+group;
-  $(idname).html(text);
+//     if(i==cut && sub!=0)
+//     {
+//       text+="</div><div class='row'>";
+//       cut=cut+sub;
+//     }
+//     i++;
+//   }
+//   idname = "#"+group;
+//   $(idname).html(text);
 
-  var j = start;
-  while (j <= end) {
-    var textname = name+j;
-    showBooking(textname);
-    j++;
-  }
+//   var j = start;
+//   while (j <= end) {
+//     var textname = name+j;
+//     showBooking(textname);
+//     j++;
+//   }
 
-}
+// }
 
 function showSeatAA(group,name,start,end,sub)
 {
@@ -182,7 +182,7 @@ function showSeatAC(group,name,start,end,sub)
   var cut = sub;
   while (i <= end) {
     textname = name+i;
-    text += "<div id='"+textname+"' class='SeatAvailable' >"+
+    text += "<div id='"+textname+"' class='SeatAvailableA' >"+
               textname+
             "</div>";
     i++;
@@ -315,11 +315,15 @@ function showBooking(seat)
       {
         // console.log(code);
         var booking_employee_id = msg.booking_employee_id;
+
+        description +="<div>";
+
         description +=msg.first_name_en+" "+msg.last_name_en;
         if(msg.first_name_en==localStorage.getItem("firstname") && msg.last_name_en==localStorage.getItem("lastname"))
         {
           cancel_btn +="  <i id='cancleBooking' class='mdi mdi-close-box-outline text-danger mx-0'  onclick='cancelBooking()'>Cancel Booking</i>";
           cancel_btn +="<input type='hidden' id='booking_employee_id' value='"+booking_employee_id+"'>"
+          cancel_btn +="<input type='hidden' id='booking_seat_id' value='"+seat+"'>"
 
         }
         else
@@ -328,10 +332,13 @@ function showBooking(seat)
         }
         description +="<br><b>At:</b> ";
         description +=msg.booking_employee_time_start+" - "+msg.booking_employee_time_end+cancel_btn;
+
+        description +="</div>";
+
       }
       else if(code==404)
       {
-        console.log("showSeat "+code);
+        // console.log("showSeat "+code);
         title ="Seat: "+seat+"";
         description += BookingForm(seat);
       }
@@ -479,16 +486,21 @@ function addBooking()
     {
       alert(msg);
     }
+    else if(code==500)
+    {
+      alert(msg);
+    }
   });
 
 }
 
-function cancelBooking(seat)
+function cancelBooking()
 {
   var booking_employee_id = $('#booking_employee_id').val();
+  var booking_seat_id = $('#booking_seat_id').val();
   var request = $.ajax({
     method: "POST",url: "api/delete.php",
-    data: { action:"cancel" , booking_employee_id:booking_employee_id }
+    data: { action:"cancel" , booking_employee_id:booking_employee_id , booking_seat_id:booking_seat_id }
   });
   request.fail(function (jqXHR, textStatus) {
     //504
@@ -498,11 +510,15 @@ function cancelBooking(seat)
     var code = msg.code;
     if(code==200)
     {
-      alert(msg);
+      var proceed = confirm("Cancel Confirm?");
+      if(proceed) 
+      {
+        location.reload();
+      }
     }
     else if(code==404)
     {
-
+      console.log(msg);
     }
   });
 }

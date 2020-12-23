@@ -3,7 +3,7 @@
     width: 50px;
     background-color: #555;
   }
-  .SeatAvailable{
+  .SeatAvailableA{
     height: 20px;
     width: 20px;
     background-color: #e5fdf5;
@@ -25,11 +25,22 @@
     font-weight: 400;
     font-size: 8px;
     text-align: center;
-    
-
   }
+
+  .SeatAvailableA:hover {
+    background-color: #ffc100;
+    border: 1px solid #ffc100;
+    cursor: pointer;
+  }
+
+  .SeatAvailableB:hover {
+    background-color: #ffc100;
+    border: 1px solid #ffc100;
+    cursor: pointer;
+  }
+
   .SeatZone{
-    border: 4px solid red;
+    border: 4px solid #ffc100;
   }
   .SeatZoneTitleA{
     margin-top: 44px;
