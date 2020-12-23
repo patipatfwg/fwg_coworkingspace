@@ -40,7 +40,7 @@ function displayDashboard()
       showSeatAB('AB','A',9,14,11);
       showSeatAC('AC','A',15,20,0);
 
-      showSeatB('BA','B',1,20,5);
+      showSeatAA('BA','B',1,20,5);
 
       showSeatC('CA','C',1,8,4);
       showSeatC('CB','C',9,22,15);
@@ -168,13 +168,15 @@ function datePicker()
 
 function showSeatAA(group,name,start,end,sub)
 {
-  var marginleft = "style='margin-top:1px; margin-left: 18px;'";
+  var marginleft = "style='margin-top:1px; margin-left: 21px;'";
   var text = "<div class='row' "+marginleft+">";
   var i = start;
   var cut = sub;
   while (i <= end) {
+    var css = "SeatAvailableB";
     textname = name+i;
-    text += "<div id='"+textname+"' class='SeatAvailableB' >"+
+    
+    text += "<div id='"+textname+"' class='"+css+"' >"+
               textname+
             "</div>";
 
@@ -183,6 +185,9 @@ function showSeatAA(group,name,start,end,sub)
       text+="</div><div class='row' "+marginleft+">";
       cut=cut+sub;
     }
+
+    showIconStatus(textname);
+
     i++;
   }
   idname = "#"+group;
@@ -214,6 +219,7 @@ function showSeatAB(group,name,start,end,sub)
       text+="</div><div class='row' style='margin-top:1px; margin-left: 40px;' >";
       cut=cut+sub;
     }
+    showIconStatus(textname);
     i++;
   }
   idname = "#"+group;
@@ -239,6 +245,7 @@ function showSeatAC(group,name,start,end,sub)
     text += "<div id='"+textname+"' class='SeatAvailableA' >"+
               textname+
             "</div>";
+            showIconStatus(textname);
     i++;
   }
   idname = "#"+group;
@@ -253,36 +260,37 @@ function showSeatAC(group,name,start,end,sub)
 
 }
 
-function showSeatB(group,name,start,end,sub)
-{
-  var marginleft = "style='margin-top 1px; margin-left: 25px;'";
-  var text = "<div class='row' "+marginleft+">";
-  var i = start;
-  var cut = sub;
-  while (i <= end) {
-    textname = name+i;
-    text += "<div id='"+textname+"' class='SeatAvailableB' >"+
-              textname+
-            "</div>";
+// function showSeatB(group,name,start,end,sub)
+// {
+//   var marginleft = "style='margin-top 1px; margin-left: 25px;'";
+//   var text = "<div class='row' "+marginleft+">";
+//   var i = start;
+//   var cut = sub;
+//   while (i <= end) {
+//     textname = name+i;
+//     text += "<div id='"+textname+"' class='SeatAvailableB' >"+
+//               textname+
+//             "</div>";
 
-    if(i==cut && sub!=0)
-    {
-      text+="</div><div class='row' "+marginleft+">";
-      cut=cut+sub;
-    }
-    i++;
-  }
-  idname = "#"+group;
-  $(idname).html(text);
+//     if(i==cut && sub!=0)
+//     {
+//       text+="</div><div class='row' "+marginleft+">";
+//       cut=cut+sub;
+//     }
+//     showIconStatus(textname);
+//     i++;
+//   }
+//   idname = "#"+group;
+//   $(idname).html(text);
 
-  var j = start;
-  while (j <= end) {
-    var textname = name+j;
-    showBooking(textname);
-    j++;
-  }
+//   var j = start;
+//   while (j <= end) {
+//     var textname = name+j;
+//     showBooking(textname);
+//     j++;
+//   }
 
-}
+// }
 
 function showSeatC(group,name,start,end,sub)
 {
@@ -301,6 +309,7 @@ function showSeatC(group,name,start,end,sub)
       text+="</div><div class='row' "+marginleft+">";
       cut=cut+sub;
     }
+    showIconStatus(textname);
     i++;
   }
   idname = "#"+group;
@@ -332,6 +341,7 @@ function showSeatD(group,name,start,end,sub)
       text+="</div><div class='row' "+marginleft+">";
       cut=cut+sub;
     }
+    showIconStatus(textname);
     i++;
   }
   idname = "#"+group;
@@ -344,6 +354,27 @@ function showSeatD(group,name,start,end,sub)
     j++;
   }
 
+}
+
+function showIconStatus(seat)
+{
+  var booking_employee_date = $('#titleDatetime').val();
+  var request = $.ajax({
+    method: "POST",url: "api/read.php",
+    data: { action:"showseatCSS", booking_seat_id:seat, booking_employee_date: booking_employee_date  }
+  });
+  request.fail(function (jqXHR, textStatus) {
+    //504
+    $("#msgbox").html("Please Check Internet");
+  });
+  request.done(function(msg) {
+    var code = msg.code;
+    if(code==200)
+    {
+      var t = msg.css;
+      document.getElementById(seat).classList.add(t);
+    }
+  });
 }
 
 function showBooking(seat)
@@ -531,15 +562,17 @@ function addBooking()
     var code = msg.code;
     if(code==200)
     {
-      console.log("Success: "+code);
-      document.getElementById("booking-form0").innerHTML = "";
-      document.getElementById("booking-form1").innerHTML = "<b class='text-center'>Booking Success</b>";
-      document.getElementById("booking-form2").innerHTML = "";
-      document.getElementById("btn-add-booking").style.display = "none";
+      // console.log("Success: "+code);
+      // document.getElementById("booking-form0").innerHTML = "";
+      // document.getElementById("booking-form1").innerHTML = "<b class='text-center'>Booking Success</b>";
+      // document.getElementById("booking-form2").innerHTML = "";
+      // document.getElementById("btn-add-booking").style.display = "none";
 
-      setTimeout(() => {
+      var proceed = confirm("Booking Confirm?");
+      if(proceed) 
+      {
         location.reload();
-      }, 3000);
+      }
 
       // setTimeout(() => {
         // var proceed = confirm("Are you sure you want to proceed?");

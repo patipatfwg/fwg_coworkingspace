@@ -39,6 +39,11 @@
     cursor: pointer;
   }
 
+  .SeatAvailableRed {
+    background-color: #ffe5e5;
+    border: 1px solid red;
+  }
+
   .SeatZone{
     border: 4px solid #ffc100;
   }

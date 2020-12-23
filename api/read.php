@@ -144,6 +144,32 @@ if($_SERVER['REQUEST_METHOD'] === 'POST')
         }
 
     }
+    else if($action=='showseatCSS')
+    {
+        include("configmdc.php");
+        $booking_seat_id = $_REQUEST["booking_seat_id"];
+        $booking_employee_date = $_REQUEST["booking_employee_date"];
+
+        $sql = "SELECT * FROM booking_employee WHERE booking_employee.booking_seat_id = '$booking_seat_id' AND booking_employee.booking_employee_date = '$booking_employee_date'";
+        // SELECT * FROM booking_employee WHERE booking_seat_id = 'A1' AND booking_employee_date = '2020-12-23'
+        $result = $mysqli->query($sql);
+        $count = mysqli_num_rows($result);
+        if($count>0)
+        {
+            $css = "SeatAvailableRed";
+        }
+        else
+        {
+            $css = "";
+        }
+
+        $code = 200;
+        $myArray = array(
+            "code"=>$code,
+            "message"=>"OK",
+            "css"=>$css
+        ); 
+    }
 
     echo json_encode($myArray); 
 }
