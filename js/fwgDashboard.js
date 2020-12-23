@@ -35,13 +35,10 @@ function displayDashboard()
       showSeatC('CC','C',23,26,24);
 
       showSeatD('DA','D',1,20,5);
-      showSeatD('DB','D',21,28,24);
-      showSeatD('DC','D',29,36,32);
+      showSeatD('DB','D',21,36,4);
 
       showSeatC('EA','E',1,24,5);
       showSeatC('EB','E',25,27,0);
-
-      // $("#msgbox").html(msg);
     }
   }); 
 }
@@ -269,7 +266,7 @@ function showSeatD(group,name,start,end,sub)
   var marginleft = "style='margin-top 1px; margin-left: 12px;'";
   var text = "<div class='row' "+marginleft+">";
   var i = start;
-  var cut = sub;
+  var cut = i + sub - 1;
   while (i <= end) {
     textname = name+i;
     text += "<div id='"+textname+"' class='SeatAvailableB' >"+
