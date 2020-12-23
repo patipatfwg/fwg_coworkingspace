@@ -3,10 +3,22 @@ function KickStartDashboard()
   $checkLogout = checkLogout();
   if($checkLogout==true)
   {
+
     $("#titleDatetime").val( FWGDate('today','string') );
+    $("#DatetimeValue").val( FWGDate('today','timestamp') );
     $("#InputDatetimeStart").val(FWGDate(2,0));
     $("#InputDatetimeEnd").val(FWGDate(3,0)); 
-    displayDashboard();    
+    displayDashboard();
+    setInterval("getDashboardStatus()", 30000);
+    
+    $('#btn-next-day').click(function(){
+      NextDay();
+    });
+
+    $('#btn-prev-day').click(function(){
+      PrevDay();
+    });
+
   }  
 }
 
@@ -64,6 +76,18 @@ function FWGDate(sw,subsw)
       var date = dt.getFullYear() + "-" +month+ "-" + dt.getDate();
       // console.log(date);
     }
+    else if(subsw=='timestamp')
+    {
+      // dt.setTime(dt.getTime() + 86400000 );
+
+      var date = dt.setTime(dt.getTime() );
+
+      // var month = (dt.getMonth());
+      // var dateS = dt.getFullYear() + "-" +month+ "-" + dt.getDate();
+
+      // var datum = Date.parse(dateS);
+      // var date = datum/1000;
+    }
     
   }
   else if(sw==2)
@@ -82,35 +106,58 @@ function FWGDate(sw,subsw)
   return date;
 }
 
-// function showSeat(group,name,start,end,sub)
-// {
-//   var text = "<div class='row'>";
-//   var i = start;
-//   var cut = sub;
-//   while (i <= end) {
-//     textname = name+i;
-//     text += "<div id='"+textname+"' class='SeatAvailable' >"+
-//               textname+
-//             "</div>";
+function abc(UNIX_timestamp)
+{
+  
 
-//     if(i==cut && sub!=0)
-//     {
-//       text+="</div><div class='row'>";
-//       cut=cut+sub;
-//     }
-//     i++;
-//   }
-//   idname = "#"+group;
-//   $(idname).html(text);
+  var myDate = new Date( UNIX_timestamp *1000);
+  var date = myDate.toLocaleString();
 
-//   var j = start;
-//   while (j <= end) {
-//     var textname = name+j;
-//     showBooking(textname);
-//     j++;
-//   }
 
-// }
+
+  var dayArr= ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+  var monthArr = ["January", "February","March", "April", "May", "June", "July", "August", "September", "October", "November","December"];
+  // var date = dayArr[day] +", "+ day +" "+ monthArr[month] +" "+ year;
+
+
+  return date;
+}
+
+function NextDay()
+{
+  // const today = new Date();
+  // const tomorrow = new Date(today);
+  // var aa = tomorrow.setDate(tomorrow.getDate() + 1);
+  // aa = abc(aa);
+
+
+
+  var aa = $("#DatetimeValue").val();
+  var aa = parseInt(aa);
+  var aaa = aa +  ( 1*24*60*60*1000);
+
+  var re = abc(aaa);
+
+// alert(re);
+  // $("#titleDatetime").val( re );
+  $("#DatetimeValue").val( aaa );
+
+}
+
+function PrevDay()
+{
+  const today = new Date();
+  const tomorrow = new Date(today);
+  var aa = tomorrow.setDate(tomorrow.getDate() - 1);
+  // aa = abc(aa);
+  $("#titleDatetime").val( aa ); 
+}
+
+function getDashboardStatus() {
+  // $('#main-panel').load('dashboard.html');
+  displayDashboard();
+}
+
 
 function showSeatAA(group,name,start,end,sub)
 {
@@ -363,9 +410,20 @@ function BookingForm(tmp_seat)
   var Hour = d.getHours();
   var Hours = Hour + 1;
 
+  var date = FWGDate('today','int');
+
   var r="";
   r +="<div id='booking-form' class='col' >";
-  r +="<div id='booking-form1' class='row' >";
+  r +="<div id='booking-form0' class='row' >";
+  r +="<div class='col-4'>";
+  r +="<label>Date :</label>";
+  r +="</div>";
+  r +="<div class='col-8'>";
+  r +="<input type='text' class='form-control form-control-sm docs-date' name='dateTimePicker' id='Inputdate' value='"+date+"' ></input>";
+  r +="</div>";
+  r +="</div>";
+
+  r +="<div id='booking-form1' class='row mt-1' >";
   r +="<div class='col-4'>";
   r +="<label>Start :</label>";
   r +="</div>";
@@ -435,8 +493,8 @@ function addBooking()
 
   var tmp_seat = $('#seat_number').val();
   var booking_zone_id = tmp_seat.substring(0, 1);
-
-  var datestart = FWGDate('today','int');
+ 
+  var datestart = $("#Inputdate").val();
   var hourstart = $("#InputHourStart").val();
   var minstart = $("#InputMinStart").val();
   var hourend = $("#InputHourEnd").val();
@@ -467,11 +525,15 @@ function addBooking()
     if(code==200)
     {
       console.log("Success: "+code);
+      document.getElementById("booking-form0").innerHTML = "";
       document.getElementById("booking-form1").innerHTML = "<b class='text-center'>Booking Success</b>";
       document.getElementById("booking-form2").innerHTML = "";
       document.getElementById("btn-add-booking").style.display = "none";
 
-  
+      setTimeout(() => {
+        location.reload();
+      }, 3000);
+
       // setTimeout(() => {
         // var proceed = confirm("Are you sure you want to proceed?");
         // if (proceed) {
@@ -484,11 +546,11 @@ function addBooking()
     }
     else if(code==404)
     {
-      alert(msg);
+      alert('404');
     }
     else if(code==500)
     {
-      alert(msg);
+      alert('505');
     }
   });
 
@@ -540,6 +602,35 @@ function checkLogout()
   }
 }
 
+// function showSeat(group,name,start,end,sub)
+// {
+//   var text = "<div class='row'>";
+//   var i = start;
+//   var cut = sub;
+//   while (i <= end) {
+//     textname = name+i;
+//     text += "<div id='"+textname+"' class='SeatAvailable' >"+
+//               textname+
+//             "</div>";
+
+//     if(i==cut && sub!=0)
+//     {
+//       text+="</div><div class='row'>";
+//       cut=cut+sub;
+//     }
+//     i++;
+//   }
+//   idname = "#"+group;
+//   $(idname).html(text);
+
+//   var j = start;
+//   while (j <= end) {
+//     var textname = name+j;
+//     showBooking(textname);
+//     j++;
+//   }
+
+// }
 
 // function getSeatDescription(seat)
 // {
