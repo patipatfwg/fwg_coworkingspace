@@ -4,7 +4,7 @@ function KickStartDashboard()
   if($checkLogout==true)
   {
 
-    $("#titleDatetime").val( FWGDate('today','string') );
+    $("#titleDatetime").val( FWGDate('today','int') );
     $("#DatetimeValue").val( FWGDate('today','timestamp') );
     $("#InputDatetimeStart").val(FWGDate(2,0));
     $("#InputDatetimeEnd").val(FWGDate(3,0)); 
@@ -153,11 +153,18 @@ function PrevDay()
   $("#titleDatetime").val( aa ); 
 }
 
-function getDashboardStatus() {
+function getDashboardStatus() 
+{
   // $('#main-panel').load('dashboard.html');
   displayDashboard();
 }
 
+function datePicker()
+{
+  var aa = $('#Inputdate');
+  // instance = new dtsel.DTS(aa);
+  instance = new dtsel.DTS('input[name="datePicker"]');
+}
 
 function showSeatAA(group,name,start,end,sub)
 {
@@ -397,7 +404,7 @@ function showBooking(seat)
             description: description,
             position: 'top',
         } 
-      }); 
+      });
 
     });
     //
@@ -419,7 +426,7 @@ function BookingForm(tmp_seat)
   r +="<label>Date :</label>";
   r +="</div>";
   r +="<div class='col-8'>";
-  r +="<input type='text' class='form-control form-control-sm docs-date' name='dateTimePicker' id='Inputdate' value='"+date+"' ></input>";
+  r +="<input type='text' class='form-control form-control-sm docs-date' name='datePicker' id='Inputdate' value='"+date+"' onclick='datePicker()'></input>";
   r +="</div>";
   r +="</div>";
 
