@@ -9,33 +9,25 @@ function KickStartDashboard()
     $("#InputDatetimeStart").val(FWGDate(2,0));
     $("#InputDatetimeEnd").val(FWGDate(3,0)); 
     displayDashboard();
-    setInterval("getDashboardStatus()", 30000);
+    setInterval("getDashboardStatus()", 60000);
     
-    $('#btn-next-day').click(function(){
-      NextDay();
-    });
-
-    $('#btn-prev-day').click(function(){
-      PrevDay();
-    });
-
   }  
 }
 
 function displayDashboard()
 {
-  var request = $.ajax({
-    method: "POST",url: "api/read.php",
-    data: { action:"dashboard" }
-  });
-  request.fail(function (jqXHR, textStatus) {
-    //504
-    alert("Please Check Internet");
-  });
-  request.done(function(msg) {
-    var code = msg.code;
-    if(code==200)
-    {
+  // var request = $.ajax({
+  //   method: "POST",url: "api/read.php",
+  //   data: { action:"dashboard" }
+  // });
+  // request.fail(function (jqXHR, textStatus) {
+  //   //504
+  //   alert("Please Check Internet");
+  // });
+  // request.done(function(msg) {
+  //   var code = msg.code;
+  //   if(code==200)
+  //   {
       showSeatAA('AA','A',1,8,4);
       showSeatAB('AB','A',9,14,11);
       showSeatAC('AC','A',15,20,0);
@@ -51,8 +43,8 @@ function displayDashboard()
 
       showSeatC('EA','E',1,24,5);
       showSeatC('EB','E',25,27,0);
-    }
-  }); 
+    // }
+  // }); 
 }
 
 function FWGDate(sw,subsw)
@@ -104,53 +96,6 @@ function FWGDate(sw,subsw)
     var date = dt.getFullYear()+"-"+month+"-"+dt.getDate()+" "+time;
   }
   return date;
-}
-
-function abc(UNIX_timestamp)
-{
-  
-
-  var myDate = new Date( UNIX_timestamp *1000);
-  var date = myDate.toLocaleString();
-
-
-
-  var dayArr= ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
-  var monthArr = ["January", "February","March", "April", "May", "June", "July", "August", "September", "October", "November","December"];
-  // var date = dayArr[day] +", "+ day +" "+ monthArr[month] +" "+ year;
-
-
-  return date;
-}
-
-function NextDay()
-{
-  // const today = new Date();
-  // const tomorrow = new Date(today);
-  // var aa = tomorrow.setDate(tomorrow.getDate() + 1);
-  // aa = abc(aa);
-
-
-
-  var aa = $("#DatetimeValue").val();
-  var aa = parseInt(aa);
-  var aaa = aa +  ( 1*24*60*60*1000);
-
-  var re = abc(aaa);
-
-// alert(re);
-  // $("#titleDatetime").val( re );
-  $("#DatetimeValue").val( aaa );
-
-}
-
-function PrevDay()
-{
-  const today = new Date();
-  const tomorrow = new Date(today);
-  var aa = tomorrow.setDate(tomorrow.getDate() - 1);
-  // aa = abc(aa);
-  $("#titleDatetime").val( aa ); 
 }
 
 function getDashboardStatus() 
@@ -371,8 +316,8 @@ function showIconStatus(seat)
     var code = msg.code;
     if(code==200)
     {
-      var t = msg.css;
-      document.getElementById(seat).classList.add(t);
+      var css = msg.css;
+      document.getElementById(seat).classList.add(css);
     }
   });
 }
@@ -383,48 +328,40 @@ function showBooking(seat)
   var seat_id = "#"+seat;
   $(seat_id).click(function(){
     //
+    var booking_employee_date = $('#titleDatetime').val();
     var request = $.ajax({
       method: "POST",url: "api/read.php",
-      data: { action:"showseat", booking_seat_id:seat }
+      data: { action:"showseat", booking_seat_id:seat , booking_employee_date:booking_employee_date  }
     });
     request.fail(function (jqXHR, textStatus) {
       //504
       $("#msgbox").html("Please Check Internet");
     });
     request.done(function(msg) {
-      var title = "Seat: "+seat;
+      var title ="";
+      title +="<div class='row'>";
+      title += "<b>Seat: "+seat;
+      title += "</div>";
+
       var description = '';
       var cancel_btn = "";
       var code = msg.code;
       if(code==200)
       {
+        title += "<div class='row'>";
+        title +=booking_employee_date;
+        title += "</div>";
+
         // console.log(code);
         var booking_employee_id = msg.booking_employee_id;
-
-        description +="<div>";
-
-        description +=msg.first_name_en+" "+msg.last_name_en;
-        if(msg.first_name_en==localStorage.getItem("firstname") && msg.last_name_en==localStorage.getItem("lastname"))
-        {
-          cancel_btn +="  <i id='cancleBooking' class='mdi mdi-close-box-outline text-danger mx-0'  onclick='cancelBooking()'>Cancel Booking</i>";
-          cancel_btn +="<input type='hidden' id='booking_employee_id' value='"+booking_employee_id+"'>"
-          cancel_btn +="<input type='hidden' id='booking_seat_id' value='"+seat+"'>"
-
-        }
-        else
-        {
-          cancel_btn +="";
-        }
-        description +="<br><b>At:</b> ";
-        description +=msg.booking_employee_time_start+" - "+msg.booking_employee_time_end+cancel_btn;
-
-        description +="</div>";
-
+        var first_name_en = msg.first_name_en;
+        var last_name_en = msg.last_name_en;
+        var booking_employee_time_start = msg.booking_employee_time_start;
+        var booking_employee_time_end = msg.booking_employee_time_end;
+        description += BookingStatudCard(first_name_en,last_name_en,booking_employee_id,seat,booking_employee_time_start,booking_employee_time_end);
       }
       else if(code==404)
       {
-        // console.log("showSeat "+code);
-        title ="Seat: "+seat+"";
         description += BookingForm(seat);
       }
 
@@ -442,13 +379,54 @@ function showBooking(seat)
   });
 }
 
+function ToggleForm()
+{
+  var booking_seat_id = $('#booking_seat_id').val();
+  $('#BookingForm').html( BookingForm(booking_seat_id) );
+  $('#btn-booking-form').hide();
+}
+
+function BookingStatudCard(first_name_en,last_name_en,booking_employee_id,seat,booking_employee_time_start,booking_employee_time_end)
+{
+  var cancel_btn = '';
+  var description ="<div>";
+
+  description +=first_name_en+" "+last_name_en;
+  if(first_name_en==localStorage.getItem("firstname") && last_name_en==localStorage.getItem("lastname"))
+  {
+    cancel_btn +="  <i id='cancleBooking' class='mdi mdi-close-box-outline text-danger mx-0'  onclick='cancelBooking()'>Cancel Booking</i>";
+    cancel_btn +="<input type='hidden' id='booking_employee_id' value='"+booking_employee_id+"'>"
+    cancel_btn +="<input type='hidden' id='booking_seat_id' value='"+seat+"'>"
+  }
+  else
+  {
+    cancel_btn +="";
+  }
+  description +="<br><b>At:</b> ";
+  description +=booking_employee_time_start+" - "+booking_employee_time_end+cancel_btn;
+  description +="</div>";
+
+  if( booking_employee_time_start !='06:00:00' && booking_employee_time_end !='23:00:00' )
+  {
+    description +="<hr>";
+    description +="<div class='row' id='BookingForm'>";
+    description +="</div>";
+    description +="<div class='row' id='btn-booking-form'>";
+    description +="<span id='btn-add-booking' class='form-control btn btn-info' onclick='ToggleForm()'>Booking Form</span>";
+    description +="</div>";
+  }
+
+  description +="<div class='row' id='alert-booking-form'>";
+  description +="</div>";
+  return   description;
+}
+
 function BookingForm(tmp_seat)
 {
   var d = new Date();
   var Hour = d.getHours();
   var Hours = Hour + 1;
-
-  var date = FWGDate('today','int');
+  var date = document.getElementById("titleDatetime").value;
 
   var r="";
   r +="<div id='booking-form' class='col' >";
@@ -457,7 +435,7 @@ function BookingForm(tmp_seat)
   r +="<label>Date :</label>";
   r +="</div>";
   r +="<div class='col-8'>";
-  r +="<input type='text' class='form-control form-control-sm docs-date' name='datePicker' id='Inputdate' value='"+date+"' onclick='datePicker()'></input>";
+  r +="<input type='text' class='form-control form-control-sm docs-date' name='datePicker' id='Inputdate' value='"+date+"' onclick='' disabled></input>";
   r +="</div>";
   r +="</div>";
 
@@ -529,100 +507,92 @@ function addBooking()
 {
   // document.getElementById("btn-add-booking").style.display = "none";
 
-  var tmp_seat = $('#seat_number').val();
-  var booking_zone_id = tmp_seat.substring(0, 1);
- 
-  var datestart = $("#Inputdate").val();
-  var hourstart = $("#InputHourStart").val();
-  var minstart = $("#InputMinStart").val();
-  var hourend = $("#InputHourEnd").val();
-  var minend = $("#InputMinEnd").val();
-  var timestart = hourstart+":"+minstart;
-  var timeend = hourend+":"+minend;  
+  var proceed = confirm("Booking Confirm?");
+  if(proceed) 
+  {
+    var tmp_seat = $('#seat_number').val();
+    var booking_zone_id = tmp_seat.substring(0, 1);
+  
+    var datestart = $("#Inputdate").val();
+    var hourstart = $("#InputHourStart").val();
+    var minstart = $("#InputMinStart").val();
+    var hourend = $("#InputHourEnd").val();
+    var minend = $("#InputMinEnd").val();
+    var timestart = hourstart+":"+minstart;
+    var timeend = hourend+":"+minend;  
 
-  var request = $.ajax({
-    method: "POST",url: "api/create.php",
-    data: { 
-      action : "add",
-      user_id : localStorage.getItem("user_id"),
-      booking_employee_date : datestart,
-      booking_employee_time_start : timestart,
-      booking_employee_time_end : timeend,
-      booking_type_id : 1,
-      booking_room_id : 0,
-      booking_zone_id : booking_zone_id,
-      booking_seat_id : tmp_seat
-    }
-  });
-  request.fail(function (jqXHR, textStatus) {
-    //504
-    $("#msgbox").html("Please Check Internet");
-  });
-  request.done(function(msg) {
-    var code = msg.code;
-    if(code==200)
-    {
-      // console.log("Success: "+code);
-      // document.getElementById("booking-form0").innerHTML = "";
-      // document.getElementById("booking-form1").innerHTML = "<b class='text-center'>Booking Success</b>";
-      // document.getElementById("booking-form2").innerHTML = "";
-      // document.getElementById("btn-add-booking").style.display = "none";
-
-      var proceed = confirm("Booking Confirm?");
-      if(proceed) 
-      {
-        location.reload();
+    var request = $.ajax({
+      method: "POST",url: "api/create.php",
+      data: { 
+        action : "add",
+        user_id : localStorage.getItem("user_id"),
+        booking_employee_date : datestart,
+        booking_employee_time_start : timestart,
+        booking_employee_time_end : timeend,
+        booking_type_id : 1,
+        booking_room_id : 0,
+        booking_zone_id : booking_zone_id,
+        booking_seat_id : tmp_seat
       }
-
-      // setTimeout(() => {
-        // var proceed = confirm("Are you sure you want to proceed?");
-        // if (proceed) {
-        //   //proceed
-        // } else {
-        //   //don't proceed
-        // }
-      // }, 2000);
-      
-    }
-    else if(code==404)
-    {
-      alert('404');
-    }
-    else if(code==500)
-    {
-      alert('505');
-    }
-  });
-
+    });
+    request.fail(function (jqXHR, textStatus) {
+      //504
+      $("#msgbox").html("Please Check Internet");
+    });
+    request.done(function(msg) {
+      var code = msg.code;
+      if(code==200)
+      {
+        console.log("Success: "+code);
+        document.getElementById("booking-form0").innerHTML = "";
+        document.getElementById("booking-form1").innerHTML = "<b class='text-center'>Booking Success</b>";
+        document.getElementById("booking-form2").innerHTML = "";
+        document.getElementById("btn-add-booking").style.display = "none";
+    
+        setTimeout(() => {
+          location.reload();
+        }, 1000);
+        
+      }
+      else if(code==404)
+      {
+        alert('404');
+      }
+      else if(code==500)
+      {
+        $('#alert-booking-form').html("<span class='text-center text-danger'>ถูกจองไปแล้ว กรุณาจองที่ใหม่</span>");
+      }
+    });
+  }
 }
 
 function cancelBooking()
 {
-  var booking_employee_id = $('#booking_employee_id').val();
-  var booking_seat_id = $('#booking_seat_id').val();
-  var request = $.ajax({
-    method: "POST",url: "api/delete.php",
-    data: { action:"cancel" , booking_employee_id:booking_employee_id , booking_seat_id:booking_seat_id }
-  });
-  request.fail(function (jqXHR, textStatus) {
-    //504
-    $("#msgbox").html("Please Check Internet");
-  });
-  request.done(function(msg) {
-    var code = msg.code;
-    if(code==200)
-    {
-      var proceed = confirm("Cancel Confirm?");
-      if(proceed) 
+  var proceed = confirm("Cancel Confirm?");
+  if(proceed) 
+  {
+    var booking_employee_id = $('#booking_employee_id').val();
+    var booking_seat_id = $('#booking_seat_id').val();
+    var request = $.ajax({
+      method: "POST",url: "api/delete.php",
+      data: { action:"cancel" , booking_employee_id:booking_employee_id , booking_seat_id:booking_seat_id }
+    });
+    request.fail(function (jqXHR, textStatus) {
+      //504
+      $("#msgbox").html("Please Check Internet");
+    });
+    request.done(function(msg) {
+      var code = msg.code;
+      if(code==200)
       {
         location.reload();
       }
-    }
-    else if(code==404)
-    {
-      console.log(msg);
-    }
-  });
+      else if(code==404)
+      {
+        console.log(msg);
+      }
+    });
+  }
 }
 
 function checkLogout()

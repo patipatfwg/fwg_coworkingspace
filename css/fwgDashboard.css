@@ -28,20 +28,25 @@
   }
 
   .SeatAvailableA:hover {
-    background-color: #ffc100;
+    /* background-color: #ffc100; */
     border: 1px solid #ffc100;
     cursor: pointer;
   }
 
   .SeatAvailableB:hover {
-    background-color: #ffc100;
+    /* background-color: #ffc100; */
     border: 1px solid #ffc100;
     cursor: pointer;
   }
 
-  .SeatAvailableRed {
+  .SeatAvailableFull {
     background-color: #ffe5e5;
     border: 1px solid red;
+  }
+
+  .SeatAvailableHalf {
+    background-color: #fbf8e2;
+    border: 1px solid #e6d849;
   }
 
   .SeatZone{
@@ -87,4 +92,9 @@
     height: 24%;
     width: 21%;
     background-color: #fff;
+  }
+
+  #titleDatetime{
+    background-color: #fff;
+    size: 50%;
   }

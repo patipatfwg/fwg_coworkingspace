@@ -29,19 +29,23 @@ if($_SERVER['REQUEST_METHOD'] === 'POST')
         }
         $booking_employee_status = "checkin";
 
-        $FLAG_CHECK = 0; 
+        $FLAG_CHECK = 1; 
         if($FLAG_CHECK==1)
         {
             date_default_timezone_set("Asia/Bangkok");
             $gettime = date("H:i");
             $getdate = date("Y-m-d");
             // $sqlbe1 = " AND CAST(booking_employee_time_start as time) >= '$booking_employee_time_start' OR  CAST(booking_employee_time_start as time) < '$booking_employee_time_end'";
-            // $sqlwhere = " AND booking_employee_date =  '$booking_employee_date'";
-            // $sql = "SELECT * FROM booking_employee WHERE booking_seat_id = '$booking_seat_id'".$sqlbe1.$sqlwhere;
+            $sql_booking_employee_date = " AND booking_employee_date =  '$booking_employee_date'";
+            $sql_booking_employee_time_start = " AND booking_employee_time_start =  '$booking_employee_time_start'";
+            $sql_booking_employee_time_end = " AND booking_employee_time_end =  '$booking_employee_time_end'";
+            $sql = "SELECT * FROM booking_employee WHERE booking_seat_id = '$booking_seat_id'".$sql_booking_employee_date.$sql_booking_employee_time_start.$sql_booking_employee_time_end; 
+
             // echo $sql;
-            // $result = $mysqli->query($sql);
-            // $count = $result->num_rows;
-            // $FLAG_CHECK==$count;
+            $result = $mysqli->query($sql);
+            $count = $result->num_rows;
+            $FLAG_CHECK = $count;
+ 
         }
 
         if($FLAG_CHECK==0)
@@ -60,10 +64,10 @@ if($_SERVER['REQUEST_METHOD'] === 'POST')
                 $msg = "Booking Fail";
             }            
         }
-        else
+        else if($FLAG_CHECK==1)
         {
             $code = 500;
-            $msg = "Seat $booking_seat_id Sold";
+            $msg = "Seat $booking_seat_id Date and Time Sold";
         }
 
         $myArray = array(

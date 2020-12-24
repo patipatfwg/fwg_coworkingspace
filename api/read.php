@@ -102,44 +102,57 @@ if($_SERVER['REQUEST_METHOD'] === 'POST')
     else if($action=='showseat')
     {
         $seat = $_REQUEST["booking_seat_id"];
+        $booking_employee_date = $_REQUEST["booking_employee_date"];
 
         include("configmdc.php");
         // $sql = "SELECT * FROM booking_employee LEFT JOIN employee ON booking_employee.user_id = employee.user_id WHERE DATE(booking_employee.booking_employee_end) = CURDATE()";
         date_default_timezone_set("Asia/Bangkok");
-        $getdate = date("Y-m-d");
-        $sqlDATE = " AND booking_employee.booking_employee_date = '$getdate'";
+        // $getdate = date("Y-m-d");
+        $sqlDATE = " AND booking_employee.booking_employee_date = '$booking_employee_date'";
         $sqlSeat = " booking_employee.booking_seat_id = '$seat'";
-        $sql = "SELECT booking_employee_id,first_name_en,last_name_en,TIME_FORMAT(booking_employee_time_start,'%H:%i') as timestart, TIME_FORMAT(booking_employee_time_end,'%H:%i') as timeend FROM booking_employee LEFT JOIN employee ON booking_employee.user_id = employee.user_id WHERE ".$sqlSeat.$sqlDATE;
-
+        $sqlOrder = " ORDER BY booking_employee.booking_employee_time_start ASC";
+        $sql = "SELECT * FROM booking_employee LEFT JOIN employee ON booking_employee.user_id = employee.user_id WHERE ".$sqlSeat.$sqlDATE.$sqlOrder;
+        // echo $sql;
         $result = $mysqli->query($sql);
         $count = mysqli_num_rows($result);
         if($count>0)
         {
-
-            $row = $result->fetch_array();
-            $booking_employee_id = $row["booking_employee_id"];
-            $first_name_en = $row["first_name_en"];
-            $last_name_en = $row["last_name_en"];
-            $booking_employee_time_start = $row["timestart"];
-            $booking_employee_time_end = $row["timeend"];
-
             $code = 200;
-            $myArray = array(
-                "code"=>$code,
-                "message"=>"OK",
-                "first_name_en"=>$first_name_en,
-                "last_name_en"=>$last_name_en,
-                "booking_employee_time_start"=>$booking_employee_time_start,
-                "booking_employee_time_end"=>$booking_employee_time_end,
-                "booking_employee_id"=>$booking_employee_id
-            );
+
+            // if($count==1)
+            // {
+                $row = $result->fetch_array();
+                $booking_employee_id = $row["booking_employee_id"];
+                $first_name_en = $row["first_name_en"];
+                $last_name_en = $row["last_name_en"];
+                $booking_employee_time_start = $row["booking_employee_time_start"];
+                $booking_employee_time_end = $row["booking_employee_time_end"]; 
+
+                $myArray = array(
+                    "code"=>$code,
+                    "message"=>"OK",
+                    "first_name_en"=>$first_name_en,
+                    "last_name_en"=>$last_name_en,
+                    "booking_employee_time_start"=>$booking_employee_time_start,
+                    "booking_employee_time_end"=>$booking_employee_time_end,
+                    "booking_employee_id"=>$booking_employee_id
+                );
+            // }
+
+            // if(){}
+            // {
+                // $row = $result->fetch_array(MYSQLI_ASSOC);
+
+            // }
+
+
         }
         else
         {
             $code = 404;
             $myArray = array(
                 "code"=>$code,
-                "message"=>"Not Found"
+                "message"=>"Seat Available"
             ); 
         }
 
@@ -150,17 +163,28 @@ if($_SERVER['REQUEST_METHOD'] === 'POST')
         $booking_seat_id = $_REQUEST["booking_seat_id"];
         $booking_employee_date = $_REQUEST["booking_employee_date"];
 
-        $sql = "SELECT * FROM booking_employee WHERE booking_employee.booking_seat_id = '$booking_seat_id' AND booking_employee.booking_employee_date = '$booking_employee_date'";
+        $sql = "SELECT booking_seat_id FROM booking_employee WHERE booking_employee.booking_seat_id = '$booking_seat_id' AND booking_employee.booking_employee_date = '$booking_employee_date'";
         // SELECT * FROM booking_employee WHERE booking_seat_id = 'A1' AND booking_employee_date = '2020-12-23'
         $result = $mysqli->query($sql);
         $count = mysqli_num_rows($result);
         if($count>0)
         {
-            $css = "SeatAvailableRed";
+            $sqlTime = " AND booking_employee_time_start = '06:00' AND booking_employee_time_end = '23:00'";
+            $sql = "SELECT booking_seat_id FROM booking_employee WHERE booking_employee.booking_seat_id = '$booking_seat_id' AND booking_employee.booking_employee_date = '$booking_employee_date'".$sqlTime;
+            $result = $mysqli->query($sql);
+            $count = mysqli_num_rows($result);
+            if($count>0)
+            {
+                $css = "SeatAvailableFull";
+            }
+            else
+            {
+                $css = "SeatAvailableHalf";
+            }
         }
         else
         {
-            $css = "";
+            $css = "SeatAvailable";
         }
 
         $code = 200;
