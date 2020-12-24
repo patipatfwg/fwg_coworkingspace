@@ -119,8 +119,8 @@ if($_SERVER['REQUEST_METHOD'] === 'POST')
         {
             $code = 200;
 
-            // if($count==1)
-            // {
+            if($count==1)
+            {
                 $row = $result->fetch_array();
                 $booking_employee_id = $row["booking_employee_id"];
                 $first_name_en = $row["first_name_en"];
@@ -131,19 +131,42 @@ if($_SERVER['REQUEST_METHOD'] === 'POST')
                 $myArray = array(
                     "code"=>$code,
                     "message"=>"OK",
+                    "type"=>"A",
                     "first_name_en"=>$first_name_en,
                     "last_name_en"=>$last_name_en,
                     "booking_employee_time_start"=>$booking_employee_time_start,
                     "booking_employee_time_end"=>$booking_employee_time_end,
                     "booking_employee_id"=>$booking_employee_id
                 );
-            // }
+            }
+            else
+            {
+                while($row = $result->fetch_array(MYSQLI_ASSOC))
+                {
+                    $booking_employee_id = $row["booking_employee_id"];
+                    $first_name_en = $row["first_name_en"];
+                    $last_name_en = $row["last_name_en"];
+                    $booking_employee_time_start = $row["booking_employee_time_start"];
+                    $booking_employee_time_end = $row["booking_employee_time_end"];
 
-            // if(){}
-            // {
-                // $row = $result->fetch_array(MYSQLI_ASSOC);
+                    $list[] = array(
+                        "booking_employee_id"=>$booking_employee_id,
+                        "booking_employee_time_start"=>$booking_employee_time_start,
+                        "booking_employee_time_end"=>$booking_employee_time_end,
+                        "first_name_en"=>$first_name_en,
+                        "last_name_en"=>$last_name_en
+                    );
+                }
 
-            // }
+                $myArray = array(
+                    "code"=>$code,
+                    "message"=>"OK",
+                    "type"=>"B",
+                    "booking_employee_date"=>$booking_employee_date,
+                    "list"=>$list
+                );                
+
+            }
 
 
         }
@@ -164,13 +187,12 @@ if($_SERVER['REQUEST_METHOD'] === 'POST')
         $booking_employee_date = $_REQUEST["booking_employee_date"];
 
         $sql = "SELECT booking_seat_id FROM booking_employee WHERE booking_employee.booking_seat_id = '$booking_seat_id' AND booking_employee.booking_employee_date = '$booking_employee_date'";
-        // SELECT * FROM booking_employee WHERE booking_seat_id = 'A1' AND booking_employee_date = '2020-12-23'
         $result = $mysqli->query($sql);
         $count = mysqli_num_rows($result);
         if($count>0)
         {
             $sqlTime = " AND booking_employee_time_start = '06:00' AND booking_employee_time_end = '23:00'";
-            $sql = "SELECT booking_seat_id FROM booking_employee WHERE booking_employee.booking_seat_id = '$booking_seat_id' AND booking_employee.booking_employee_date = '$booking_employee_date'".$sqlTime;
+            $sql = $sql.$sqlTime;
             $result = $mysqli->query($sql);
             $count = mysqli_num_rows($result);
             if($count>0)
