@@ -111,64 +111,36 @@ if($_SERVER['REQUEST_METHOD'] === 'POST')
         $sqlDATE = " AND booking_employee.booking_employee_date = '$booking_employee_date'";
         $sqlSeat = " booking_employee.booking_seat_id = '$seat'";
         $sqlOrder = " ORDER BY booking_employee.booking_employee_time_start ASC";
-        $sql = "SELECT * FROM booking_employee LEFT JOIN employee ON booking_employee.user_id = employee.user_id WHERE ".$sqlSeat.$sqlDATE.$sqlOrder;
+        $sql = "SELECT booking_employee_id, first_name_en, last_name_en, TIME_FORMAT(booking_employee.booking_employee_time_start,'%H:%i') as booking_employee_time_start,TIME_FORMAT(booking_employee.booking_employee_time_end, '%H:%i') as booking_employee_time_end FROM booking_employee LEFT JOIN employee ON booking_employee.user_id = employee.user_id WHERE ".$sqlSeat.$sqlDATE.$sqlOrder;
         // echo $sql;
         $result = $mysqli->query($sql);
         $count = mysqli_num_rows($result);
         if($count>0)
         {
             $code = 200;
-
-            if($count==1)
+            while($row = $result->fetch_array(MYSQLI_ASSOC))
             {
-                $row = $result->fetch_array();
                 $booking_employee_id = $row["booking_employee_id"];
                 $first_name_en = $row["first_name_en"];
                 $last_name_en = $row["last_name_en"];
                 $booking_employee_time_start = $row["booking_employee_time_start"];
-                $booking_employee_time_end = $row["booking_employee_time_end"]; 
+                $booking_employee_time_end = $row["booking_employee_time_end"];
 
-                $myArray = array(
-                    "code"=>$code,
-                    "message"=>"OK",
-                    "type"=>"A",
-                    "first_name_en"=>$first_name_en,
-                    "last_name_en"=>$last_name_en,
+                $list[] = array(
+                    "booking_employee_id"=>$booking_employee_id,
                     "booking_employee_time_start"=>$booking_employee_time_start,
                     "booking_employee_time_end"=>$booking_employee_time_end,
-                    "booking_employee_id"=>$booking_employee_id
+                    "first_name_en"=>$first_name_en,
+                    "last_name_en"=>$last_name_en
                 );
             }
-            else
-            {
-                while($row = $result->fetch_array(MYSQLI_ASSOC))
-                {
-                    $booking_employee_id = $row["booking_employee_id"];
-                    $first_name_en = $row["first_name_en"];
-                    $last_name_en = $row["last_name_en"];
-                    $booking_employee_time_start = $row["booking_employee_time_start"];
-                    $booking_employee_time_end = $row["booking_employee_time_end"];
 
-                    $list[] = array(
-                        "booking_employee_id"=>$booking_employee_id,
-                        "booking_employee_time_start"=>$booking_employee_time_start,
-                        "booking_employee_time_end"=>$booking_employee_time_end,
-                        "first_name_en"=>$first_name_en,
-                        "last_name_en"=>$last_name_en
-                    );
-                }
-
-                $myArray = array(
-                    "code"=>$code,
-                    "message"=>"OK",
-                    "type"=>"B",
-                    "booking_employee_date"=>$booking_employee_date,
-                    "list"=>$list
-                );                
-
-            }
-
-
+            $myArray = array(
+                "code"=>$code,
+                "message"=>"OK",
+                "booking_employee_date"=>$booking_employee_date,
+                "list"=>$list
+            );                 
         }
         else
         {

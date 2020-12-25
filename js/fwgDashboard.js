@@ -9,7 +9,7 @@ function KickStartDashboard()
     $("#InputDatetimeStart").val(FWGDate(2,0));
     $("#InputDatetimeEnd").val(FWGDate(3,0)); 
     displayDashboard();
-    setInterval("getDashboardStatus()", 60000);
+    // setInterval("getDashboardStatus()", 60000);
     
   }  
 }
@@ -53,7 +53,14 @@ function FWGDate(sw,subsw)
   var dt = new Date();
   var time = dt.getHours() + ":" + dt.getMinutes();
 
-  if(sw=='today')
+  if(sw=='custom')
+  {
+    var dayArr= ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+    dt.setDate(dt.getDate());
+    var monthArr = ["January", "February","March", "April", "May", "June", "July", "August", "September", "October", "November","December"];
+    var date = dayArr[dt.getDay()].toUpperCase() +", "+ dt.getDate() +" "+ monthArr[dt.getMonth()].toUpperCase() +" "+ dt.getFullYear(); 
+  }
+  else if(sw=='today')
   {
     if(subsw=='string')
     {
@@ -100,7 +107,7 @@ function FWGDate(sw,subsw)
 
 function getDashboardStatus() 
 {
-  // $('#main-panel').load('dashboard.html');
+  $('#main-panel').load('dashboard.html');
   displayDashboard();
 }
 
@@ -338,53 +345,36 @@ function showBooking(seat)
       $("#msgbox").html("Please Check Internet");
     });
     request.done(function(msg) {
-      var title ="";
-      title +="<div class='row'>";
-      title += "<b>Seat: "+seat;
-      title += "</div>";
 
+      var title = titleForm(2,seat,booking_employee_date);
+      
       var description = '';
-      var cancel_btn = "";
       var code = msg.code;
       if(code==200)
       {
-        var type = msg.type;
-        var booking_employee_id = msg.booking_employee_id;
+        description += "<div class='col'>";
 
-        title += "<div class='row'>";
-        title +=booking_employee_date;
-        title += "</div>";
-
-        if(type=="A")
+        var list = msg.list;
+        if(list.length>0)
         {
-          var first_name_en = msg.first_name_en;
-          var last_name_en = msg.last_name_en;
-          var booking_employee_time_start = msg.booking_employee_time_start;
-          var booking_employee_time_end = msg.booking_employee_time_end;
-
-          description += BookingStatudCard(first_name_en,last_name_en,booking_employee_id,seat,booking_employee_time_start,booking_employee_time_end,type);
-        }
-        else if(type=="B")
-        {
-          var list = msg.list;
           $.each( list, function( key, msg ) {
             var first_name_en = msg.first_name_en;
             var last_name_en = msg.last_name_en;
             var booking_employee_time_start = msg.booking_employee_time_start;
             var booking_employee_time_end = msg.booking_employee_time_end;
-            description += BookingStatudCard(first_name_en,last_name_en,booking_employee_id,seat,booking_employee_time_start,booking_employee_time_end,type);
+            var booking_employee_id = msg.booking_employee_id;
+            description += BookingStatudCard(first_name_en,last_name_en,booking_employee_id,seat,booking_employee_time_start,booking_employee_time_end);
           });
 
-          if( booking_employee_time_start =='06:00:00' && booking_employee_time_end =='23:00:00' ){}
-          else
-          {
-            description +="<div class='row' id='BookingForm'>";
-            description +="</div>";
-            description +="<div class='row' id='btn-booking-form'>";
-            description +="<span id='btn-add-booking' class='form-control btn btn-info' onclick='ToggleForm()'>Booking Form</span>";
-            description +="</div>";
-          }
+          // if( booking_employee_time_start =='06:00' && booking_employee_time_end =='23:00' ){}
+          // else
+          // {
+          description += ToggleFormButton();
+          // }
         }
+        description +="</div>";
+        description +="<div class='row' id='alert-booking-form'>";
+        description +="</div>";
       }
       else if(code==404)
       {
@@ -394,9 +384,9 @@ function showBooking(seat)
       driver.highlight({
         element: seat_id,
         popover: {
-            title: title,
-            description: description,
-            position: 'top',
+          title: title,
+          description: description,
+          position: 'top',
         } 
       });
 
@@ -412,14 +402,41 @@ function ToggleForm()
   $('#btn-booking-form').hide();
 }
 
-function BookingStatudCard(first_name_en,last_name_en,booking_employee_id,seat,booking_employee_time_start,booking_employee_time_end,type)
+function titleForm(type,seat,booking_employee_date)
+{
+  var title="";
+  title +="<div class='col'>";
+  title +="<div class='row display-6'>Seat: "+seat+"</div>";
+  if(type==2)
+  {
+    title +="<div class='row'><small>"+booking_employee_date+"</small></div>";
+    // title +="<input type='hidden' id='booking_employee_date' value='"+booking_employee_date+"'>";
+    title +="<hr>";
+  }
+  title +="</div>";
+
+  return title;
+}
+
+function ToggleFormButton()
+{
+  var description = "";
+  description +="<div class='row' id='BookingForm'>";
+  description +="</div>";
+  description +="<div class='row' id='btn-booking-form'>";
+  description +="<span id='btn-add-booking' class='form-control btn btn-info' onclick='ToggleForm()'>Booking Form</span>";
+  description +="</div>";
+  return description;
+}
+
+function BookingStatudCard(first_name_en,last_name_en,booking_employee_id,seat,booking_employee_time_start,booking_employee_time_end)
 {
   var cancel_btn = '';
-  var description ="<div>";
+  var description ="";
 
   if(first_name_en==localStorage.getItem("firstname") && last_name_en==localStorage.getItem("lastname"))
   {
-    cancel_btn +="  <b><i id='cancleBooking' class='mdi mdi-close-box-outline text-danger mx-0'  onclick='cancelBooking()'>Cancel</i></b>";
+    cancel_btn +="    <button class='btn btn-danger text-light mx-0 btn btn-sm' id='cancleBooking' onclick='cancelBooking()'><i class='fa fa-trash-o' aria-hidden='true'></i></button>";
     cancel_btn +="<input type='hidden' id='booking_employee_id' value='"+booking_employee_id+"'>"
     cancel_btn +="<input type='hidden' id='booking_seat_id' value='"+seat+"'>"
   }
@@ -428,33 +445,17 @@ function BookingStatudCard(first_name_en,last_name_en,booking_employee_id,seat,b
     cancel_btn +="";
   }
 
-  if(type=="A")
-  {
-    description +=first_name_en+" "+last_name_en;
-    description +="<br>";
-    description +=booking_employee_time_start+" - "+booking_employee_time_end+cancel_btn;
-    description +="</div>";
+  description +="<div class='row pt-1'>";
+  description +="<div class='col-8' >";
+  description +="<h6>"+booking_employee_time_start+" - "+booking_employee_time_end+"</h6>";
+  description +="<small><i>"+first_name_en+" "+last_name_en+"</i></small>";
+  description +='</div>';
+  description +="<div class='col-4'>";
+  description +=cancel_btn;
+  description +='</div>';
+  description +='</div>';
+  description +='<hr>';
 
-    if( booking_employee_time_start =='06:00:00' && booking_employee_time_end =='23:00:00' ){}
-    else
-    {
-      description +="<hr>";
-      description +="<div class='row' id='BookingForm'>";
-      description +="</div>";
-      description +="<div class='row' id='btn-booking-form'>";
-      description +="<span id='btn-add-booking' class='form-control btn btn-info' onclick='ToggleForm()'>Booking Form</span>";
-      description +="</div>";
-    }
-  }
-  else if(type=="B")
-  {
-    description +=booking_employee_time_start+" - "+booking_employee_time_end+cancel_btn;
-    description +="<br><i>"+first_name_en+" "+last_name_en+"</i><hr>";
-  }
-  
-
-  description +="<div class='row' id='alert-booking-form'>";
-  description +="</div>";
   return   description;
 }
 
@@ -464,24 +465,30 @@ function BookingForm(tmp_seat)
   var Hour = d.getHours();
   var Hours = Hour + 1;
   var date = document.getElementById("titleDatetime").value;
-
+  // var date = document.getElementById("booking_employee_date").value;
   var r="";
-  r +="<div id='booking-form' class='col' >";
-  r +="<div id='booking-form0' class='row' >";
-  r +="<div class='col-4'>";
-  r +="<label>Date :</label>";
-  r +="</div>";
-  r +="<div class='col-8'>";
-  r +="<input type='text' class='form-control form-control-sm docs-date' name='datePicker' id='Inputdate' value='"+date+"' onclick='' disabled></input>";
-  r +="</div>";
-  r +="</div>";
 
-  r +="<div id='booking-form1' class='row mt-1' >";
-  r +="<div class='col-4'>";
-  r +="<label>Start :</label>";
-  r +="</div>";
-  r +="<div class='col-4'>";
-  r +="<select class='form-select form-control-sm' id='InputHourStart' required=''>";
+  r +=""
+  +"<div id='booking-form' class='col' >"
+  +"<div id='booking-form0' class='row' >"
+  +"<div class='col-4'>"
+  +"<label>Date :</label>"
+  +"</div>"
+  +"<div class='col-8'>"
+  +"<input type='text' class='form-control form-control-sm docs-date' name='datePicker' id='Inputdate' value='"+date+"' onclick='' disabled></input>"
+  +"</div>"
+  +"</div>"
+  +"";
+
+  r +=""
+  +"<div id='booking-form1' class='row mt-1' >"
+  +"<div class='col-4'>"
+  +"<label>Start :</label>"
+  +"</div>"
+  +"<div class='col-4'>"
+  +"<select class='form-select form-control-sm' id='InputHourStart' required=''>"
+  +"";
+  
   var i=6;
   while(i<=23)
   {

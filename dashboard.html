@@ -61,15 +61,22 @@
   <!-- </div> -->
 <!-- </div> -->
 <div class="row">
-  <div class="col-10"></div>
-  <div class="col-2">
-    <div class="input-group">
-      <input type="text" class="form-control" placeholder="Recipient's username" aria-label="Recipient's username" name="titleDatetime" id="titleDatetime">
-      <div class="input-group-append">
-        <button class="btn btn-sm btn-warning" id="search-date" type="button">Search</button>
+  <div class="col-lg">
+  <div class="col-12 justify-content-md-center">
+    <div class="col-6">
+      <button class="btn btn-sm btn-info" onclick="getDashboardStatus()" title="Refresh Now"><i class="fa fa-refresh" aria-hidden="true"></i> Refresh</button>
+      <small class="text-info align-text-bottom"> updated at : 2020-12-25 12:30</small>
+    </div>
+    <div class="col-6">
+      <div class="input-group">
+        <input type="text" class="form-control" placeholder="Recipient's username" aria-label="Recipient's username" name="titleDatetime" id="titleDatetime">
+        <div class="input-group-append">
+          <button class="btn btn-sm btn-warning" id="search-date" type="button">Search</button>
+        </div>
       </div>
     </div>
   </div>
+  <div class="row">
   <div class="col-md-12 grid-margin stretch-card">
     <div class="card">
       <div class="card-body" id="Floor29">
@@ -129,6 +136,7 @@
 
       </div>
     </div>
+  </div>
   </div>
 </div>
 
